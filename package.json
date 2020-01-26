@@ -1,0 +1,50 @@
+{
+  "name": "mta-countdown-clock",
+  "version": "1.0.0",
+  "description": "NYC MTA Subway Countdown Clock for Raspberry Pi",
+  "main": "server.js",
+  "scripts": {
+    "build": "webpack --config ./webpack.config.js",
+    "lint": "tslint 'src/*.ts' -t verbose --project tsconfig.json && pretty-quick --verbose",
+    "lint:staged": "tslint 'src/*.ts' -t verbose --project tsconfig.json && pretty-quick --staged",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "ts-node src/server.ts",
+    "start": "node ./dist/bundle.js",
+    "nodemon": "nodemon --exec 'ts-node src/server.ts'"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint:staged && npm run test"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:edwarddistel/mta-countdown-clock.git"
+  },
+  "keywords": [],
+  "author": "Edward Distel",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "gtfs-rb": "^1.2.8",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.2",
+    "awesome-typescript-loader": "^5.2.1",
+    "dotenv-webpack": "^1.7.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "nodemon": "^2.0.2",
+    "prettier-eslint": "^9.0.1",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-node-externals": "^1.7.2"
+  }
+}

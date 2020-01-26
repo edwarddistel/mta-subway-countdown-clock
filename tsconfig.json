@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "target": "ESnext",
+    "forceConsistentCasingInFileNames": true,
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "importHelpers": true,
+  },
+  "include": ["./src/*"]
+}

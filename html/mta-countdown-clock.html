@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>MTA Countdown Clock</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/main.css" />
+
+    <meta name="theme-color" content="#fafafa" />
+    <style>
+      * {
+        font-family: Helvetica, Arial, sans-serif;
+        cursor: none;
+      }
+      body {
+        background-color: #09f;
+        padding: 20px;
+        overflow: hidden;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 400px;
+        width: 100%;
+        justify-items: center;
+      }
+      tbody tr {
+        height: 48px;
+        border-bottom: 1px solid #e3f1d5;
+      }
+      table {
+        border-collapse: collapse;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 5px 10px 20px #555;
+        overflow: hidden;
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+        position: relative;
+        text-align: center;
+      }
+      thead tr {
+        height: 60px;
+        background: #000;
+        color: #fff;
+        font-size: 20px;
+      }
+      .img {
+        width: 50px;
+      }
+      .eta,
+      .minAway {
+        width: 110px;
+      }
+      td {
+        font-size: 24px;
+        height: 75px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="grid">
+      <div class="box">
+        <table class="table" id="station-1">
+          <thead>
+            <th id="station-1" colspan="3"></th>
+          </thead>
+          <tbody id="tbody-station-1"></tbody>
+        </table>
+      </div>
+      <div class="box">
+        <table class="table" id="station-2">
+          <thead>
+            <th id="station-2" colspan="3"></th>
+          </thead>
+          <tbody id="tbody-station-2"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="js/vendor/modernizr-3.8.0.min.js"></script>
+
+    <script>
+      // Populate HTML tables with train data
+      const populateTables = (data, tbodyId) => {
+        // Get the HTML table
+        const tbody = document.querySelector(`#${tbodyId}`);
+
+        // If it exists
+        if (tbody) {
+          // Limit the results to 5 or less
+          const limit = data.trains.length < 5 ? data.trains.length : 5;
+
+          // Check to see if this is the first time you're loading the data
+          let firstPass = tbody && tbody.innerHTML === "";
+
+          // First or second table
+          const index = tbodyId ? tbodyId.charAt(tbodyId.length - 1) : "1";
+
+          // Update the header text
+          const header = document.querySelector(`#station-${index} th`);
+          if (header) {
+            header.innerText = data.name;
+          }
+
+          // Loop through the trains
+          for (let i = 0; i < limit; i++) {
+            // Get the train number. Sometimes they include letters, like X for express. Remove those
+            const trainId = data.trains[i].trainId.replace(/[^0-9.]/g, "");
+
+            // If empty, populate for the first time
+            if (firstPass) {
+              // Create a new row
+              const tr = document.createElement("tr");
+              tr.className = "tr-trip";
+              tr.id = `${tbodyId}-tr-${i}`;
+
+              // Fill it with data
+              tr.innerHTML = `
+              <td class='img'><img src="./img/${trainId}.svg"/></td>
+              <td class='eta'>${data.trains[i].eta}</td>
+              <td class='minAway'>${data.trains[i].minAway}</td>`;
+
+              // Add it
+              tbody.appendChild(tr);
+              if (i === limit) firstPass = false;
+            } else {
+              // Otherwise update existing tables to avoid "flashing"
+              const tr = document.querySelector(
+                `#${tbodyId} tr:nth-child(${i + 1})`
+              );
+
+              if (
+                tr &&
+                tr.querySelector(".img img").src !== `./img/${trainId}.svg`
+              ) {
+                tr.querySelector(".img img").src = `./img/${trainId}.svg`;
+              }
+              tr.querySelector(".eta").innerText = data.trains[i].eta;
+              tr.querySelector(".minAway").innerText = data.trains[i].minAway;
+            }
+          }
+        }
+      };
+
+      // Fetch the raw data from the back end
+      const getData = async () => {
+        return await fetch("http://localhost:4000").then(response =>
+          response.status === 200
+            ? response.json()
+            : `${response.status} - ${response.statusText}`
+        );
+      };
+
+      // Fetch train data nd populate tables
+      const fireApp = async () => {
+        const trainData = await getData();
+        if (typeof trainData !== "string") {
+          const stations = Object.keys(trainData.stations);
+
+          stations.forEach((station, i) => {
+            populateTables(
+              trainData.stations[station],
+              `tbody-station-${i + 1}`
+            );
+          });
+        } else {
+          console.error(`Error: ${trainData}`);
+        }
+      };
+      fireApp();
+      setInterval(fireApp, 10000);
+    </script>
+  </body>
+</html>
