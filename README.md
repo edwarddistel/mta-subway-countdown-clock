@@ -196,7 +196,15 @@ sudo systemctl enable countdown-clock
 
 Test it with: `curl http://localhost:4000`. You should see results. If not, check the logs `journalctl -u countdown-clock`
 
-### Step 12: Set the Pi to boot into Chromium Kiosk mode
+### Step 12: Install Chromim and set the Pi to boot into Chromium Kiosk mode
+
+To displa the front end HTML, you'll need Chromium.
+
+```
+sudo apt-get install chromium
+```
+
+Then you'll want to auto-boot into Chromium with Kiosk mode opening the front end of the application:
 
 For me what worked was [http://raspberrypi.stackexchange.com/questions/38515/auto-start-chromium-on-raspbian-jessie-11-2015](http://raspberrypi.stackexchange.com/questions/38515/auto-start-chromium-on-raspbian-jessie-11-2015):
 
