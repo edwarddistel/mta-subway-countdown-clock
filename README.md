@@ -218,7 +218,7 @@ sudo nano ~/.config/autostart/autoChromium.desktop
 ```
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk file:///var/www/countdown-clock/html/mta-countdown-clock.html
+Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk --disable-component-update file:///var/www/countdown-clock/html/mta-countdown-clock.html
 Hidden=false
 X-GNOME-Autostart-enabled=true
 Name[en_US]=AutoChromium
