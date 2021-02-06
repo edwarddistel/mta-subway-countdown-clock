@@ -12,7 +12,7 @@ I also provide instructions on how to install this on a Raspberry Pi so you can 
 
 ### Step 1: Get a free API key from the MTA
 
-Register for a free API key from the MTA [https://datamine.mta.info/user/register](https://datamine.mta.info/user/register). It'll be a 32-character code. Write it down.
+Register for a free API key from the MTA [https://api.mta.info/#/AccessKey](https://api.mta.info/#/AccessKey). It'll be a 40-character code. Write it down.
 
 ![MTA API Key](./github-images/mta-api-key.png)
 
@@ -21,7 +21,7 @@ Register for a free API key from the MTA [https://datamine.mta.info/user/registe
 
 `git clone git@github.com:edwarddistel/mta-countdown-clock.git` or download the zip.
 
-### Step 3: Decide the stations you want the data for
+### Step 3a: Decide the stations you want the data for
 
 Open `station-data.json` and search for the name of the stations you want. E.g., "Times Square". Write down the station IDs, e.g. "725N" (for north-bound trains) or "725S" (for south-bound trains).
 
@@ -37,12 +37,31 @@ If you want ALL the trains coming into Union Square, use all 3 station IDs and t
 
 However if two lines run on the same track they will use the SAME station ID.
 
+### Step 3b: Select the MTA Subway endpoint
+
+Recently the MTA revised their API and for some reason decided to make each subway line it's own URL. So now you must also decide which subway lines you want to pull for.
+
+My app is currently only set to read from 1 URL -- they changed this after I built it. If I have time I'll revise to meet the new structure but for now you you can only pick one of these:
+
+[https://api.mta.info/#/subwayRealTimeFeeds](https://api.mta.info/#/subwayRealTimeFeeds):
+
+- (A, C, E) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace 
+- (B, D, F, M) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm
+- (G) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g
+- (J, Z) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz
+- (N, Q, R, W) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw
+- (L) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l
+- (1, 2, 3, 4, 5, 6) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs
+- (7) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-7
+- (SIR) - https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si (???)
+
 ### Step 4: Update the .env config file
 
 Open `.env` in your code editor to find:
 
 ```
 /* Custom environment variables */
+MTA_API_ENDPOINT = https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs
 MTA_API_KEY = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 STATIONS = "725N 725S"
 ```
@@ -60,6 +79,8 @@ npm run start
 ```
 
 ![Screenshot](./github-images/npm-run-build.png)
+
+Recently I've been getting some dependency check error when installing, just run `npm install --force` if you get this.
 
 This should build a new version of the app via webpack into `dist/bundle.js` and run it:
 

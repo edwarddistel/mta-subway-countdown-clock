@@ -32,7 +32,10 @@ function convertEpoch(time: number): string {
 async function makeRequest(url: string) {
   try {
     const response = await axios.get(url, {
-      responseType: "arraybuffer"
+      responseType: "arraybuffer",
+      headers: {
+        "x-api-key": process.env.MTA_API_KEY
+      }
     });
     return Promise.resolve(response);
   } catch (err) {
@@ -57,8 +60,12 @@ async function getRawData() {
 
   // Iterate through all feeds
   Object.keys(feeds).forEach(async line => {
-    const url = `http://datamine.mta.info/mta_esi.php?key=${process.env.MTA_API_KEY}&feed_id=${line}`;
-    promises.push(makeRequest(url));
+    if (process.env.MTA_API_ENDPOINT != null) {
+      const url = process.env.MTA_API_ENDPOINT;
+      promises.push(makeRequest(url));  
+    } else {
+      console.error("Error - you must select an MTA API endpoint");
+    }
   });
   return Promise.all(promises);
 }
