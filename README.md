@@ -57,7 +57,7 @@ My app is currently only set to read from 1 URL -- they changed this after I bui
 
 ### Step 4: Update the .env config file
 
-Open `.env` in your code editor to find:
+Open `.env.example` in your code editor to find:
 
 ```
 /* Custom environment variables */
@@ -66,7 +66,9 @@ MTA_API_KEY = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 STATIONS = "725N 725S"
 ```
 
-Replace the x's in the `MTA_API_KEY` with the key you wrote down in Step 1. Replace the station IDs with the numbers you wrote down in Step 3. Note the station string should remain encased in double quotes and separated by spaces, as shown. Save.
+First, copy that file to `.env`.
+
+Then replace the x's in the `MTA_API_KEY` with the key you wrote down in Step 1. Replace the station IDs with the numbers you wrote down in Step 3. Note the station string should remain encased in double quotes and separated by spaces, as shown. Save.
 
 ### Step 5: Test the app
 
