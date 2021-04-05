@@ -219,7 +219,7 @@ sudo systemctl enable countdown-clock
 
 Test it with: `curl http://localhost:4000`. You should see results. If not, check the logs `journalctl -u countdown-clock`
 
-### Step 12: Install Chromim and set the Pi to boot into Chromium Kiosk mode
+### Step 12: Install Chromium and set the Pi to boot into Chromium Kiosk mode
 
 To displa the front end HTML, you'll need Chromium.
 
