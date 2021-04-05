@@ -1,6 +1,6 @@
-import express from "express";
-import cors from "cors";
-import { getMtaData } from "./mta";
+import express from 'express';
+import cors from 'cors';
+import { getMtaData } from './mta';
 
 const app = express();
 const port = 4000;
@@ -10,6 +10,6 @@ const server = app.listen(port, async () => {
   console.log(`MTA Countdown API live on ${port}`);
 });
 
-app.get("/", async (req: express.Request, res: express.Response) =>
+app.get('/', async (req: express.Request, res: express.Response) =>
   res.send(await getMtaData())
 );

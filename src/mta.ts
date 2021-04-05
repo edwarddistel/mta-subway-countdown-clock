@@ -1,9 +1,9 @@
-import dotenv from "dotenv";
-import axios from "axios";
-import gtfsRB from "gtfs-rb";
-import { ITrip, IJsonResponse } from "./mta-interfaces";
+import dotenv from 'dotenv';
+import axios from 'axios';
+import gtfsRB from 'gtfs-rb';
+import { ITrip, IJsonResponse } from './mta-interfaces';
 
-const stationData = require("./station-data.json");
+const stationData = require('./station-data.json');
 const { FeedMessage } = gtfsRB.transit_realtime;
 dotenv.config();
 
@@ -24,7 +24,7 @@ function secsToMins(time: number): string {
 function convertEpoch(time: number): string {
   const date: Date = new Date(time * 1000);
   return date
-    .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+    .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     .toLowerCase();
 }
 
@@ -32,10 +32,10 @@ function convertEpoch(time: number): string {
 async function makeRequest(url: string) {
   try {
     const response = await axios.get(url, {
-      responseType: "arraybuffer",
+      responseType: 'arraybuffer',
       headers: {
-        "x-api-key": process.env.MTA_API_KEY
-      }
+        'x-api-key': process.env.MTA_API_KEY,
+      },
     });
     return Promise.resolve(response);
   } catch (err) {
@@ -48,23 +48,23 @@ async function makeRequest(url: string) {
 async function getRawData() {
   const promises: any[] = [];
   const feeds = {
-    1: "1,2,3,4,5,6,S",
-    2: "L",
-    16: "N,Q,R,W",
-    21: "B,D,F,M",
-    26: "A,C,E,H,S",
-    31: "G",
-    36: "J,Z",
-    51: "7"
+    1: '1,2,3,4,5,6,S',
+    2: 'L',
+    16: 'N,Q,R,W',
+    21: 'B,D,F,M',
+    26: 'A,C,E,H,S',
+    31: 'G',
+    36: 'J,Z',
+    51: '7',
   };
 
   // Iterate through all feeds
-  Object.keys(feeds).forEach(async line => {
+  Object.keys(feeds).forEach(async (line) => {
     if (process.env.MTA_API_ENDPOINT != null) {
       const url = process.env.MTA_API_ENDPOINT;
-      promises.push(makeRequest(url));  
+      promises.push(makeRequest(url));
     } else {
-      console.error("Error - you must select an MTA API endpoint");
+      console.error('Error - you must select an MTA API endpoint');
     }
   });
   return Promise.all(promises);
@@ -77,76 +77,88 @@ function arriveFirst(a: ITrip, b: ITrip): number {
 
 // Get data from the MTA
 export const getMtaData = async () => {
-    // Prepare response
+  // Prepare response
   const jsonResponse: IJsonResponse = {
-    stations: {}
+    stations: {},
   };
 
   // Pull in selected stations from environment file
-  const stations: string[] = process && process.env && process.env.STATIONS ? process.env.STATIONS.split(" ") : [];
-    // Data structure for response
+  const stations: string[] =
+    process && process.env && process.env.STATIONS
+      ? process.env.STATIONS.split(' ')
+      : [];
+  // Data structure for response
   stations.forEach((station: string) => {
     jsonResponse.stations[station] = {
       name: stationData[station].stop_name,
-      trains: []
+      trains: [],
     };
   });
-    // Fetch the data from the MTA
+  // Fetch the data from the MTA
   const responses: any = await getRawData();
-    responses.forEach((response: any) => {
-        // If successful
+  // Prevent duplicates in the response from the MTA
+  const tripIds = new Set();
+  responses.forEach((response: any) => {
+    // If successful
     if (response.status === 200) {
       try {
-
         // Convert from GTFS format to JSON
-        const feed = FeedMessage.decode(Buffer.from(response.data, "binary"));
+        const feed = FeedMessage.decode(Buffer.from(response.data, 'binary'));
 
         const currentTime: number = Math.round(Date.now() / 1000);
 
         // Parse each train's data
-        feed.entity.forEach((entity:any) => {
+        feed.entity.forEach((entity: any) => {
           // Half of the entities are vehiclePosition updates; get the other half, scheduled trip updates
           if (entity.tripUpdate && entity.tripUpdate.stopTimeUpdate) {
-            // For each scheduled stop on each trip
-            entity.tripUpdate.stopTimeUpdate.forEach((scheduledTrip:any) => {
-              // If the trip hits one of the selected stations
-              if (stations.includes(scheduledTrip.stopId)) {
-                // For storing in the JSON response
-                const whichStation: string = scheduledTrip.stopId;
-                // If a scheduled departure time (an ETA when it will leave that station)
-                if (
-                  scheduledTrip &&
-                  scheduledTrip.departure &&
-                  scheduledTrip.departure.time
-                ) {
-                  // @ts-ignore Difference from current time
-                  const timeDiff:number =
-                    scheduledTrip.departure.time - currentTime;
+            if (entity.tripUpdate.trip && entity.tripUpdate.trip.tripId) {
+              const tripId: string = entity.tripUpdate.trip.tripId;
+              if (!tripIds.has(tripId)) {
+                tripIds.add(tripId);
+                // For each scheduled stop on each trip
+                entity.tripUpdate.stopTimeUpdate.forEach(
+                  (scheduledTrip: any) => {
+                    // If the trip hits one of the selected stations
+                    if (stations.includes(scheduledTrip.stopId)) {
+                      // For storing in the JSON response
+                      const whichStation: string = scheduledTrip.stopId;
+                      // If a scheduled departure time (an ETA when it will leave that station)
+                      if (
+                        scheduledTrip &&
+                        scheduledTrip.departure &&
+                        scheduledTrip.departure.time
+                      ) {
+                        // @ts-ignore Difference from current time
+                        const timeDiff: number =
+                          scheduledTrip.departure.time - currentTime;
 
-                  // If not in the past
-                  if (timeDiff > 0) {
-                    // @ts-ignore Convert ugly UNIX Epch time to human readable
-                    const departureTime: string = convertEpoch(
-                      scheduledTrip.departure.time
-                    );
+                        // If not in the past
+                        if (timeDiff > 0) {
+                          // @ts-ignore Convert ugly UNIX Epch time to human readable
+                          const departureTime: string = convertEpoch(
+                            scheduledTrip.departure.time
+                          );
 
-                    // Human readable minutes away
-                    const minutesAway: string = secsToMins(timeDiff);
+                          // Human readable minutes away
+                          const minutesAway: string = secsToMins(timeDiff);
 
-                    // Build trip object
-                    const trip: ITrip = {
-                      trainId: entity.tripUpdate.trip.routeId,
-                      eta: departureTime,
-                      minAway: minutesAway,
-                      rawEta: timeDiff
-                    };
+                          // Build trip object
+                          const trip: ITrip = {
+                            trainId: entity.tripUpdate.trip.routeId,
+                            eta: departureTime,
+                            minAway: minutesAway,
+                            rawEta: timeDiff,
+                          };
 
-                    // Add to response
-                    jsonResponse.stations[whichStation].trains.push(trip);
+                          // Add to response
+                          jsonResponse.stations[whichStation].trains.push(trip);
+                        }
+                      }
+                    }
                   }
-                }
+                );
               }
-            });
+            }
           }
         });
       } catch (err) {
@@ -162,10 +174,8 @@ export const getMtaData = async () => {
   });
 
   // Sort by arriving first
-  Object.values(jsonResponse.stations).forEach(station => {
+  Object.values(jsonResponse.stations).forEach((station) => {
     station.trains.sort(arriveFirst);
   });
   return jsonResponse;
 };
-
-

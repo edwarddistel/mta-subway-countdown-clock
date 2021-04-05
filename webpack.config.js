@@ -14,11 +14,15 @@ module.exports = {
   },
 
   module: {
-    rules: [{ test: /\.ts$/, loader: 'awesome-typescript-loader', exclude: /node_modules/ }],
+    rules: [
+      {
+        test: /\.ts$/,
+        loader: 'awesome-typescript-loader',
+        exclude: /node_modules/,
+      },
+    ],
   },
-  plugins: [
-    new Dotenv(),
-  ],
+  plugins: [new Dotenv()],
   target: 'node',
   externals: [nodeExternals()],
 };
