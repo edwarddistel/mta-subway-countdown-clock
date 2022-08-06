@@ -110,8 +110,12 @@
 
           // Loop through the trains
           for (let i = 0; i < limit; i++) {
-            // Get the train number. Sometimes they include letters, like X for express. Remove those
-            const trainId = data.trains[i].trainId.replace(/[^0-9.]/g, "");
+            let trainId = data.trains[i].trainId
+
+            if (trainId.length > 1) {
+              // Get the train number. Sometimes they include letters, like X for express. Remove those
+              trainId = trainId.replace(/[^0-9.]/g, "");
+            }
 
             // If empty, populate for the first time
             if (firstPass) {
