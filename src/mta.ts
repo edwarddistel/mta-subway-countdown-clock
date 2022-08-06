@@ -47,26 +47,25 @@ async function makeRequest(url: string) {
 // The MTA has 8 different feeds to pull the data from
 async function getRawData() {
   const promises: any[] = [];
-  const feeds = {
-    1: '1,2,3,4,5,6,S',
-    2: 'L',
-    16: 'N,Q,R,W',
-    21: 'B,D,F,M',
-    26: 'A,C,E,H,S',
-    31: 'G',
-    36: 'J,Z',
-    51: '7',
+  const baseUrl: string = 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs'
+
+  const feeds: Record<number, Array<string>> = {
+    1: ['1,2,3,4,5,6,S', ''],
+    2: ['L', '-l'],
+    16: [ 'N,Q,R,W', '-nqrw'],
+    21: ['B,D,F,M', '-bdfm'],
+    26: ['A,C,E,H,S', '-ace'],
+    31: ['G', '-g'],
+    36: ['J,Z','-jz'],
+    51: ['7', '-si'],
   };
 
   // Iterate through all feeds
   Object.keys(feeds).forEach(async (line) => {
-    if (process.env.MTA_API_ENDPOINT != null) {
-      const url = process.env.MTA_API_ENDPOINT;
-      promises.push(makeRequest(url));
-    } else {
-      console.error('Error - you must select an MTA API endpoint');
-    }
+    const suffix: string = feeds[parseInt(line)][1]
+    promises.push(makeRequest(`${baseUrl}${suffix}`))
   });
+
   return Promise.all(promises);
 }
 
