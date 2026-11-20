@@ -1,54 +1,26 @@
 {
-  "name": "mta-countdown-clock",
-  "version": "1.1.0",
-  "description": "NYC MTA Subway Countdown Clock for Raspberry Pi",
-  "main": "server.js",
-  "scripts": {
-    "build": "webpack --config ./webpack.config.js",
-    "dev": "nodemon --exec 'ts-node src/server.ts'",
-    "format": "npx prettier --single-quote --write \"src/**/*.{ts,tsx,js}\"",
-    "lint": "tslint 'src/*.ts' -t verbose --project tsconfig.json && pretty-quick --verbose",
-    "lint:staged": "tslint 'src/*.ts' -t verbose --project tsconfig.json && pretty-quick --staged",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "ts-node src/server.ts",
-    "start": "node ./dist/bundle.js",
-    "update": "ncu -u && npm update && rm package-lock.json && npm install"
+  "name": "mta-subway-countdown-clock",
+  "version": "2.0.0",
+  "private": true,
+  "description": "An always-on NYC subway arrival board, built for the browser and Raspberry Pi.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.16.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint:staged && npm run test"
-    }
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "test": "node --test test/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
+    "lint": "node scripts/check.js",
+    "check": "npm run lint && npm test"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:edwarddistel/mta-countdown-clock.git"
+    "url": "https://github.com/edwarddistel/mta-countdown-clock.git"
   },
-  "keywords": [],
   "author": "Edward Distel",
   "license": "ISC",
-  "dependencies": {
-    "axios": "0.21.1",
-    "cors": "2.8.5",
-    "dotenv": "10.0.0",
-    "express": "4.17.1",
-    "gtfs-rb": "1.2.8"
-  },
-  "devDependencies": {
-    "@types/cors": "2.8.12",
-    "@types/express": "4.17.13",
-    "awesome-typescript-loader": "5.2.1",
-    "dotenv-webpack": "7.0.3",
-    "eslint": "7.32.0",
-    "eslint-config-airbnb-base": "14.2.1",
-    "eslint-plugin-import": "2.24.1",
-    "nodemon": "2.0.12",
-    "npm-check-updates": "11.8.3",
-    "prettier-eslint": "13.0.0",
-    "source-map-loader": "3.0.0",
-    "ts-node": "10.2.1",
-    "typescript": "4.3.5",
-    "webpack": "5.51.1",
-    "webpack-cli": "4.8.0",
-    "webpack-node-externals": "3.0.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

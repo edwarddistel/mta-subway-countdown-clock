@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1118">
+  <meta name="description" content="Live NYC subway arrival times for your selected stations.">
+  <title>MTA Subway Countdown Clock</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/app.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <div>
+          <p class="eyebrow">NEW YORK CITY TRANSIT</p>
+          <h1>Subway arrivals<span class="punctuation">.</span></h1>
+        </div>
+      </div>
+      <div class="time-panel">
+        <span class="eyebrow">NEW YORK TIME</span>
+        <time id="current-time" class="clock">--:--</time>
+      </div>
+    </header>
+
+    <main>
+      <div class="status-bar">
+        <span class="live-indicator"><span class="live-dot" aria-hidden="true"></span> <span id="feed-status" role="status">Connecting to MTA…</span></span>
+        <span id="last-updated" class="last-updated">Fetching arrivals</span>
+      </div>
+      <div id="station-grid" class="station-grid" aria-label="Subway arrival boards"></div>
+      <p class="footer-note">Predicted arrivals are provided by the MTA and may change. Refreshes automatically.</p>
+    </main>
+
+    <footer>Countdown Clock <span aria-hidden="true">/</span> Powered by NYC Transit GTFS-Realtime</footer>
+  </div>
+</body>
+</html>
